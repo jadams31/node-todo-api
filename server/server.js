@@ -1,4 +1,5 @@
 //See https://mongoosejs.com/docs/guide.html for api details
+const {ObjectId} = require('mongodb');
 var express = require('express');
 var bodyParser = require('body-parser');
 var {mongoose} = require('./db/mongoose');
@@ -15,6 +16,23 @@ app.get('/todos', (req, res) => {
     res.status(400).send(e);
   });
 });
+
+app.get('/todos/:id', (req, res) => {
+  var id = req.params.id;
+
+  if (!ObjectId.isValid(id)) {
+    return res.status(400).send('Invalid ID');
+  }
+
+  Todo.findById(id).then((todo) => {
+    if (!todo) {
+      return res.status(404).send();
+    }
+
+    res.send({todo});
+  }).catch((e) => {
+    res.status(400).send(e);
+  });
 
 app.post('/todos', (req, res) => {
   console.log(req.body);
